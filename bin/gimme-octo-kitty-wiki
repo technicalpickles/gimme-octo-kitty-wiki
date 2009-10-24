@@ -1,0 +1,40 @@
+require 'nokogiri'
+require 'open-uri'
+require 'stringex'
+require 'git'
+
+username = ARGV[0]
+repo = ARGV[1]
+
+base_url = "http://wiki.github.com/#{username}/#{repo}"
+
+wiki_directory = "#{username}-#{repo}-wiki"
+FileUtils.mkdir_p wiki_directory
+
+
+github_login = Git.global_config('github.user')
+github_token = Git.global_config('github.token')
+
+
+doc = Nokogiri::HTML(open(base_url))
+
+doc.search('.sidebar ul li a').each do |page_link|
+  page_title = page_link.content
+  page_slug = page_title.to_url
+
+  edit_url = "http://github.com/#{username}/#{repo}/wikis/#{page_slug}/edit?login=#{github_login}&token=#{github_token}"
+
+  edit_doc = Nokogiri::HTML(open(edit_url))
+
+  textile = nil
+  edit_doc.search('textarea').each do |wiki_body|
+    textile = wiki_body.content
+  end
+
+  File.open("#{wiki_directory}/#{page_slug}.textile", "w") do |file|
+    file.write textile
+  end
+
+end
+
+puts "#{username}/#{repo} wiki has been scrapped into #{wiki_directory}"
