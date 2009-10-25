@@ -1,6 +1,8 @@
 = gimme-octo-kitty-wiki
 
-Description goes here.
+A script to pull down a project's wiki on GitHub locally.
+
+    gimme-octo-kitty-wiki technicalpickles jeweler
 
 == Note on Patches/Pull Requests
  
